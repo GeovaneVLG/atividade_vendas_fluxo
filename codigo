@@ -1,0 +1,138 @@
+def cadastrar_cliente(nome):
+    clientes.append(nome)
+    return True
+
+def remover_cliente(nome):
+    try:
+        clientes.remove(nome)
+        msg = True
+    except:
+        msg = False
+    return msg
+
+def cadastrar_funcionario(nome):
+    funcionarios.append(nome)
+    vendas_funcionario[nome] = 0
+    return True
+
+def remover_funcionario(nome):
+    try:
+        funcionarios.remove(nome)
+        msg = True
+    except:
+        msg = False
+    return msg
+
+def cadastrar_produto(produto,valor):
+    codigo = 0
+    if codigo not in produtos.keys():
+        produtos[codigo] = (produto,valor)
+        vendas_produtos[produto] = 0
+        return True
+    else:
+        for x in produtos.keys():
+            codigo = x
+        codigo += 1
+        produtos[codigo] = (produto,valor)
+        vendas_produtos[produto] = 0
+        msg = True 
+    return msg
+
+def remover_produto(codigo):
+    try:
+       del produtos[codigo]
+       msg = True
+    except:
+        msg = False
+    return msg
+
+def registro_vendas(codigo,cliente,funcionario,pagamento,quantidade=1):
+    numero = 0
+    if cliente in clientes:
+        if codigo in produtos.keys():
+            nomeprod = produtos[codigo][0]
+            valor = produtos[codigo][1] * quantidade
+            if funcionario in funcionarios:
+                if numero not in vendas.keys():
+                    vendas[numero] = (codigo,cliente,funcionario,pagamento,nomeprod,valor,quantidade)
+                    return True
+                else:
+                    for x in vendas.keys():
+                        numero = x
+                    numero += 1
+                    vendas[numero] = (codigo,cliente,funcionario,pagamento,nomeprod,valor,quantidade)
+                    return True
+            else:
+                mgs = False
+        else:
+            msg = False
+    else:
+        msg = False 
+    return msg
+
+def fluxo_caixa():
+    for x in vendas.keys():
+        if vendas[x][3] == "dinheiro":
+            dinheiro.append(vendas[x][5])
+            v = vendas_funcionario[vendas[x][2]] + vendas[x][5]
+            vendas_funcionario[funcionarios[funcionarios.index(vendas[x][2])]] = v
+            vp = vendas_produtos[vendas[x][4]] + vendas[x][5]
+            vendas_produtos[produtos[vendas[x][0]][0]] = vp
+        if vendas[x][3] == "credito":
+            credito.append(vendas[x][5])
+            v = vendas_funcionario[vendas[x][2]] + vendas[x][5]
+            vendas_funcionario[funcionarios[funcionarios.index(vendas[x][2])]] = v
+            vp = vendas_produtos[vendas[x][4]] + vendas[x][5]
+            vendas_produtos[produtos[vendas[x][0]][0]] = vp
+        if vendas[x][3] == "debito":
+            debito.append(vendas[x][5])
+            v = vendas_funcionario[vendas[x][2]] + vendas[x][5]
+            vendas_funcionario[funcionarios[funcionarios.index(vendas[x][2])]] = v
+            vp = vendas_produtos[vendas[x][4]] + vendas[x][5]
+            vendas_produtos[produtos[vendas[x][0]][0]] = vp
+    print(f'Pago em creditos: {sum(credito)}\nPago em debito: {sum(debito)}\nPago em dinheiro: {sum(dinheiro)}\nSaldo total: {sum(credito) + sum(debito) + sum(dinheiro)}')
+    print(f'Valor gasto em cada produto: {vendas_produtos}')
+    print(f'Vendas de cada funcionario: {vendas_funcionario}')
+
+
+clientes = []
+funcionarios = []
+vendas_funcionario = {}
+vendas_produtos = {}
+produtos = {}
+credito = []
+debito = []
+dinheiro = []
+vendas = {}
+
+cadastrar_produto('adesivos',2.5)
+cadastrar_produto('lapis',0.5)
+cadastrar_produto('caderno',10)
+cadastrar_produto('mochila',115)
+cadastrar_produto('bolsa',30)
+cadastrar_produto('fichario',15)
+
+cadastrar_cliente('geovane')
+cadastrar_cliente('wanderson')
+cadastrar_cliente('deividson')
+cadastrar_cliente('lucas')
+cadastrar_cliente('jussel')
+cadastrar_cliente('paola')
+cadastrar_cliente('luan')
+
+cadastrar_funcionario('raquel')
+cadastrar_funcionario('marco')
+cadastrar_funcionario('edson')
+cadastrar_funcionario('cenora')
+cadastrar_funcionario('montanha')
+
+registro_vendas(0,'geovane','raquel','debito',3)
+registro_vendas(1,'deividson','marco','credito',2)
+registro_vendas(3,'lucas','montanha','credito')
+registro_vendas(4,'luan','raquel','debito',5)
+registro_vendas(5,'jussel','cenora','credito',)
+registro_vendas(2,'paola','edson','dinheiro',2)
+registro_vendas(5,'wanderson','edson','dinheiro',6)
+registro_vendas(3,'geovane','marco','debito')
+
+fluxo_caixa()
